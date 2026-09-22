@@ -2,27 +2,33 @@ import React, { useState } from 'react';
 import { useRun } from './useRun.js';
 
 const stateColor = {
-  idle: '#888',
-  connecting: '#e0a800',
-  connected: '#28a745',
-  reconnecting: '#e0a800',
-  disconnected: '#dc3545',
-  completed: '#28a745',
-  failed: '#dc3545',
-  interrupted: '#dc3545',
+  idle: '#5a5f6a',
+  connecting: '#d4a017',
+  connected: '#2ea043',
+  reconnecting: '#d4a017',
+  disconnected: '#f85149',
+  completed: '#2ea043',
+  failed: '#f85149',
+  interrupted: '#f85149',
 };
+
+const surface = '#161a22';
+const border = '#262c36';
+const textMuted = '#8b95a5';
 
 function StatusPill({ state, error }) {
   return (
     <span
       style={{
         display: 'inline-block',
-        padding: '2px 10px',
-        borderRadius: 12,
-        background: stateColor[state] || '#888',
+        padding: '3px 12px',
+        borderRadius: 14,
+        background: stateColor[state] || '#5a5f6a',
         color: 'white',
         fontSize: 12,
-        fontFamily: 'monospace',
+        fontWeight: 600,
+        letterSpacing: 0.3,
+        fontFamily: "'Space Mono', ui-monospace, monospace",
       }}
       title={error || ''}
     >
@@ -32,12 +38,27 @@ function StatusPill({ state, error }) {
   );
 }
 
+const btnStyle = {
+  padding: '8px 14px',
+  background: '#1f2530',
+  color: '#e6e8ee',
+  border: `1px solid ${border}`,
+  borderRadius: 6,
+  fontSize: 13,
+  fontFamily: 'inherit',
+  cursor: 'pointer',
+};
+
+const primaryBtnStyle = {
+  ...btnStyle,
+  background: '#2ea043',
+  border: '1px solid #2ea043',
+  fontWeight: 600,
+};
+
 export default function App() {
   const [input, setInput] = useState('Tell me about streaming.');
-  const [runId, setRunId] = useState(() => {
-    // Restore in-progress runId across full reload so refresh mid-stream resumes.
-    return localStorage.getItem('activeRunId') || null;
-  });
+  const [runId, setRunId] = useState(() => localStorage.getItem('activeRunId') || null);
   const { text, state, error, disconnect, reconnect } = useRun(runId);
 
   const send = async () => {
@@ -48,7 +69,6 @@ export default function App() {
     });
     const { runId: newRunId } = await res.json();
     localStorage.setItem('activeRunId', newRunId);
-    // Wipe old cursor for the new run so we start from 0.
     setRunId(newRunId);
   };
 
@@ -59,42 +79,61 @@ export default function App() {
   };
 
   return (
-    <div style={{ maxWidth: 720, margin: '40px auto', fontFamily: 'system-ui, sans-serif', padding: 16 }}>
-      <h1>Resumable Conversation</h1>
-      <p style={{ color: '#555' }}>
+    <div style={{ maxWidth: 760, margin: '40px auto', padding: 20 }}>
+      <h1 style={{ margin: 0, fontSize: 32, letterSpacing: -0.5 }}>Resumable Conversation</h1>
+      <p style={{ color: textMuted, marginTop: 8, lineHeight: 1.5 }}>
         Kill the tab or stop the server mid-stream. Reopen. The reply should pick up exactly where it left off.
       </p>
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 20 }}>
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          style={{ flex: 1, padding: 8, fontSize: 14 }}
-          placeholder="Say something. Include FAIL to test failure. Include COUNT:30 for 30 tokens."
+          style={{
+            flex: 1,
+            padding: '10px 12px',
+            fontSize: 14,
+            background: surface,
+            color: '#e6e8ee',
+            border: `1px solid ${border}`,
+            borderRadius: 6,
+            fontFamily: 'inherit',
+            outline: 'none',
+          }}
+          placeholder="Include FAIL to trigger failure. Include COUNT:30 for 30 tokens."
         />
-        <button onClick={send} style={{ padding: '8px 16px' }}>Send</button>
+        <button onClick={send} style={primaryBtnStyle}>Send</button>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 12 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', margin: '14px 0' }}>
         <StatusPill state={state} error={error} />
-        {runId ? <code style={{ fontSize: 12 }}>runId: {runId}</code> : null}
-        <button onClick={disconnect} disabled={!runId} style={{ marginLeft: 'auto' }}>Force disconnect</button>
-        <button onClick={reconnect} disabled={!runId}>Reconnect</button>
-        <button onClick={clear} disabled={!runId}>Clear</button>
+        {runId ? (
+          <code style={{ fontSize: 12, color: textMuted, fontFamily: "'Space Mono', monospace" }}>
+            runId: {runId}
+          </code>
+        ) : null}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+          <button onClick={disconnect} disabled={!runId} style={btnStyle}>Force disconnect</button>
+          <button onClick={reconnect} disabled={!runId} style={btnStyle}>Reconnect</button>
+          <button onClick={clear} disabled={!runId} style={btnStyle}>Clear</button>
+        </div>
       </div>
 
       <div
         style={{
-          minHeight: 160,
-          padding: 16,
-          border: '1px solid #ddd',
+          minHeight: 200,
+          padding: 18,
+          border: `1px solid ${border}`,
           borderRadius: 8,
-          background: '#fafafa',
-          fontFamily: 'ui-monospace, monospace',
+          background: surface,
+          color: '#e6e8ee',
+          fontFamily: "'Space Mono', ui-monospace, monospace",
+          fontSize: 14,
+          lineHeight: 1.7,
           whiteSpace: 'pre-wrap',
         }}
       >
-        {text || <span style={{ color: '#aaa' }}>Reply will stream here.</span>}
+        {text || <span style={{ color: textMuted }}>Reply will stream here.</span>}
       </div>
     </div>
   );

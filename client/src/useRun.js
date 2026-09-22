@@ -64,11 +64,21 @@ export function useRun(runId) {
     });
 
     es.onopen = () => setState((s) => (s === 'reconnecting' ? 'connected' : s));
-    es.onerror = () => {
-      // Browser will auto-retry, but we want visible state + bounded attempts +
-      // jittered backoff so the UI doesn't churn.
+    es.onerror = async () => {
       es.close();
       esRef.current = null;
+      // Before retrying, ask the server if the run even exists. A 404 means
+      // the runId is stale (e.g., in-memory db was reset) — no point retrying.
+      try {
+        const probe = await fetch(`/api/runs/${runId}`);
+        if (probe.status === 404) {
+          setError('run_not_found');
+          setState('failed');
+          return;
+        }
+      } catch {
+        // network really is down; fall through to backoff.
+      }
       if (attemptRef.current >= RECONNECT_MAX_ATTEMPTS) {
         setState('disconnected');
         return;
@@ -82,7 +92,15 @@ export function useRun(runId) {
   }, [runId]);
 
   useEffect(() => {
-    if (!runId) return;
+    // Reset display + cursor whenever the runId changes so a new turn starts clean.
+    setText('');
+    setError(null);
+    cursorRef.current = 0;
+    attemptRef.current = 0;
+    if (!runId) {
+      setState('idle');
+      return;
+    }
     connect();
     return disconnect;
   }, [runId, connect, disconnect]);

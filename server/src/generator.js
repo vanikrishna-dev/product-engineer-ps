@@ -5,6 +5,16 @@ const CANNED_REPLIES = [
   'Sure, here is what I think about that. It is a considered answer that arrives one token at a time so we can watch it stream.',
   'That is a good question. Let me break it down piece by piece so you can see the streaming behaviour work end to end.',
   'Okay, streaming a response now. Each word you see arrived as its own event and was persisted before it reached your screen.',
+  'Great, let me walk you through it. Every word is written to durable storage the moment it is produced so nothing is lost if the connection drops.',
+  'Interesting prompt. The important thing to notice is that these words are numbered in order, and the client remembers the last number it saw.',
+  'Here is my take. If you disconnect halfway through, the server will replay the missed words from the database and then continue live seamlessly.',
+  'Let me answer that. Notice how the reply appears smoothly even though each word is a separate persisted event under the hood.',
+  'Alright, thinking about this now. The response is being generated deterministically, which means the same question always produces the same answer for testing.',
+  'Good one. What you are watching is a resumable stream, meaning even a full page refresh mid-reply would pick up exactly where it left off.',
+  'Let me explain. The client tracks a cursor of the last word it received, and on reconnect asks the server for everything after that cursor.',
+  'Here is what I want to say. The design keeps durable history separate from the transient connection, which is why interruptions do not corrupt the reply.',
+  'Sure thing. Every terminal state, whether completed, failed, or interrupted, is final and cannot be silently changed later on.',
+  'Okay so, the fun part is that the fake model here is fully deterministic, which lets the tests assert exact output without flakiness.',
 ];
 
 function pickReply(seed) {

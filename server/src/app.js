@@ -45,7 +45,7 @@ function buildApp({ generatorDelayMs } = {}) {
       userMessageId,
       userMessageContent: content,
     });
-    const handle = startRun(runId, content, { delayMs: generatorDelayMs });
+    const handle = startRun(runId, content, { delayMs: generatorDelayMs ?? 8 });
     inflight.set(runId, handle);
     handle.promise.finally(() => inflight.delete(runId));
     res.json({ runId, userMessageId });

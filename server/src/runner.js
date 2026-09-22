@@ -7,7 +7,7 @@ const bus = require('./pubsub');
 //   2. published to live subscribers
 // Terminal events ('completed' | 'failed') are also persisted and published.
 // The generator itself is fire-and-forget from the request handler's POV.
-async function startRun(runId, userMessage, opts = {}) {
+function startRun(runId, userMessage, opts = {}) {
   const controller = new AbortController();
   const promise = (async () => {
     try {

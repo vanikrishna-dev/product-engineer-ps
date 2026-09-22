@@ -130,6 +130,12 @@ Exponential backoff, jittered, capped at 5s, bounded to 8 attempts. After the ca
 | AC6 unknown/stale cursor | `AC6: cursor ahead of a terminal run yields explicit cursor_invalid` + `AC6b: unknown runId yields 404` |
 | Ordering invariant | `append-event uniqueness: two concurrent appends produce distinct seqs` |
 
+## Credibility note
+
+I shipped a React Native app to both the Play Store and App Store. End to end, I owned the mobile stack: feature work, performance tuning, API integration, and every release cut. Two numbers from that build I actually care about. Cold start load time came down by around 30% after I reworked the initial render path, and 30 day retention lifted around 15% once we shipped the changes.
+
+What that experience taught me is what "production-ready" actually costs. It's the boring stuff that doesn't make it onto a resume. Reproducing a crash you can't reproduce locally. Catching a regression that only shows up on one Android version. Waiting three days on an App Store review because a screenshot had the wrong aspect ratio. I'm early in my career but I've already been through the full loop of shipping something real to people who complain when it breaks, and that mental model is what shows up in how I built this take-home.
+
 ## File map
 
 ```
