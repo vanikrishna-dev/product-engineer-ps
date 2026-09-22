@@ -1,0 +1,13 @@
+{
+  "name": "resumable-realtime-conversation",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Resumable realtime conversation — Caygnus PS #1",
+  "workspaces": ["server", "client"],
+  "scripts": {
+    "dev:server": "npm --workspace server run dev",
+    "dev:client": "npm --workspace client run dev",
+    "test": "npm --workspace server test",
+    "benchmark": "npm --workspace server run benchmark"
+  }
+}
